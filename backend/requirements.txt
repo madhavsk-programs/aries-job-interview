@@ -1,0 +1,26 @@
+# --- API + config ---------------------------------------------------------
+fastapi>=0.116,<1.0
+uvicorn[standard]>=0.35,<1.0
+pydantic>=2.9,<3.0
+pydantic-settings>=2.10,<3.0
+python-dotenv>=1.1,<2.0
+python-multipart>=0.0.20,<1.0
+pypdf>=6.0,<7.0
+
+# --- Local realtime voice (Phase 1) --------------------------------------
+livekit-api>=1.0,<2.0
+livekit-agents[openai,silero]>=1.7.1,<2.0
+
+# --- Local evaluation + orchestration (Phase 2) --------------------------
+httpx>=0.28,<1.0
+langgraph>=0.6,<0.8
+
+# --- Storage (Phase 2) ----------------------------------------------------
+sqlalchemy[asyncio]>=2.0.36,<3.0
+asyncpg>=0.30
+pgvector>=0.3.6,<0.5
+greenlet>=3.1,<4.0
+
+# --- Observability (Phase 2) ---------------------------------------------
+opentelemetry-sdk>=1.29,<2.0
+opentelemetry-exporter-otlp-proto-http>=1.29,<2.0

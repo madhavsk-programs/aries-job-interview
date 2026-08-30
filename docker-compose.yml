@@ -1,0 +1,53 @@
+# Postgres with pgvector preinstalled. Phase 2 uses the relational tables;
+# Phase 3 uses the vector column on `questions` for question-bank retrieval.
+#
+#   docker compose up -d
+#   cd backend && python -m db.init
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: aries-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aries
+      POSTGRES_PASSWORD: aries
+      POSTGRES_DB: aries
+    ports:
+      - "5432:5432"
+    volumes:
+      - aries-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aries -d aries"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # OpenAI-compatible local speech server: Faster-Whisper STT + Kokoro TTS.
+  # Host port 8001 avoids the ARIES API on port 8000.
+  speaches:
+    image: ghcr.io/speaches-ai/speaches:latest-cuda
+    container_name: aries-speaches
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    environment:
+      WHISPER__INFERENCE_DEVICE: cuda
+      WHISPER__COMPUTE_TYPE: float16
+    volumes:
+      - aries-speech-models:/home/ubuntu/.cache/huggingface/hub
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+
+volumes:
+  aries-pgdata:
+  aries-speech-models:
